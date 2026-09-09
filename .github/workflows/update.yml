@@ -1,0 +1,50 @@
+# Формула по событию из релиза sdlc-pipeline-backend.
+#
+# release.yml там после публикации архивов шлёт repository_dispatch с тегом
+# и содержимым checksums.txt; отсюда формула рендерится без единого запроса
+# к приватному репозиторию сервиса — тапу его токен не нужен. Руками то же
+# самое делает workflow_dispatch с теми же двумя полями.
+name: update
+
+on:
+  repository_dispatch:
+    types: [clab-release]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Тег релиза, например v0.1.0"
+        required: true
+      checksums:
+        description: "Содержимое checksums.txt из релиза"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: formula
+  cancel-in-progress: false
+
+jobs:
+  formula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: отрендерить и закоммитить
+        env:
+          TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+          CHECKSUMS: ${{ github.event.client_payload.checksums || inputs.checksums }}
+        run: |
+          [ -n "$TAG" ] && [ -n "$CHECKSUMS" ] || { echo "✗ нужны tag и checksums"; exit 1; }
+          printf '%s\n' "$CHECKSUMS" > /tmp/checksums.txt
+          bin/formula.sh "$TAG" /tmp/checksums.txt > Formula/clab.rb
+          ruby -c Formula/clab.rb
+          git add Formula/clab.rb
+          if git diff --cached --quiet; then
+            echo "формула для $TAG уже такая"
+            exit 0
+          fi
+          git -c user.name="update.yml" -c user.email="update@cadence-lab-tech.invalid" \
+            commit -m "clab $TAG"
+          git push
