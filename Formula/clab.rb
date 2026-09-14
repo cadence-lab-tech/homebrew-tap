@@ -8,31 +8,31 @@ require_relative "../lib/private_strategy"
 class Clab < Formula
   desc "Cadence Lab: задачи, гейты и MCP из терминала"
   homepage "https://github.com/cadence-lab-tech/sdlc-pipeline-backend"
-  version "0.2.0"
+  version "0.3.0"
 
   on_macos do
     on_arm do
-      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.2.0/clab_v0.2.0_darwin_arm64.tar.gz",
+      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.3.0/clab_v0.3.0_darwin_arm64.tar.gz",
           using: GitHubPrivateReleaseDownloadStrategy
-      sha256 "d79201c73c55626245d2f096bd4e7936fe7e8dd169cd227e0fad00c7dc3c2a3d"
+      sha256 "2b5b6f6af3e5133c6c28431c0988d2578096b86d305b6fd1738fb1382dfdfccf"
     end
     on_intel do
-      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.2.0/clab_v0.2.0_darwin_amd64.tar.gz",
+      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.3.0/clab_v0.3.0_darwin_amd64.tar.gz",
           using: GitHubPrivateReleaseDownloadStrategy
-      sha256 "335233469d7bf44f704ce292aa26fa7dd1354d9a26fce1b8bbe00a23e4ee6c56"
+      sha256 "50d67d3fa882104801e71b934ae8571888e42ef56d481827c47b9a91e0a189c7"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.2.0/clab_v0.2.0_linux_arm64.tar.gz",
+      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.3.0/clab_v0.3.0_linux_arm64.tar.gz",
           using: GitHubPrivateReleaseDownloadStrategy
-      sha256 "9689cb093186f0fe06d073f46b2ede421f7760d34c0b6e309a683d7903b57bb7"
+      sha256 "5e30bc3876085325652addca7015f31f98308a3aa3ac0ed049473b5ba9c3a3ba"
     end
     on_intel do
-      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.2.0/clab_v0.2.0_linux_amd64.tar.gz",
+      url "https://github.com/cadence-lab-tech/sdlc-pipeline-backend/releases/download/v0.3.0/clab_v0.3.0_linux_amd64.tar.gz",
           using: GitHubPrivateReleaseDownloadStrategy
-      sha256 "5f5b25f8714c776a47a70d60cf18793e28a0e8b47f1c619f15cda4fdc4b9b753"
+      sha256 "7f6204eb844fd5e5bd3fec571fddaab613bedb7484dd0e4974346cdcb7115ad8"
     end
   end
 
@@ -41,6 +41,6 @@ class Clab < Formula
   end
 
   test do
-    assert_match "clab v0.2.0", shell_output("#{bin}/clab version")
+    assert_match "clab v0.3.0", shell_output("#{bin}/clab version")
   end
 end
