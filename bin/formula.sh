@@ -5,14 +5,14 @@
 #   bin/formula.sh v0.1.0 checksums.txt > Formula/clab.rb
 #
 # Зовёт workflow update.yml по событию из релиза sdlc-pipeline-backend;
-# checksums.txt — тот же, что лежит в релизе. Репозиторий с релизами
-# приватный, поэтому формула качает через lib/private_strategy.rb, а не по
-# прямой ссылке.
+# checksums.txt — тот же, что лежит в релизе. Архивы лежат в релизах этого
+# же публичного тапа, поэтому формула качает по прямой ссылке, без токена и
+# без своей стратегии скачивания.
 set -eu
 
 tag="${1:?тег релиза, например v0.1.0}"
 sums="${2:?путь к checksums.txt}"
-repo="${CLAB_RELEASE_REPO:-cadence-lab-tech/sdlc-pipeline-backend}"
+repo="${CLAB_RELEASE_REPO:-cadence-lab-tech/homebrew-tap}"
 version="${tag#v}"
 
 sum() {
@@ -34,7 +34,6 @@ cat <<RUBY
 
 # Формулу пишет bin/formula.sh по событию из релиза sdlc-pipeline-backend;
 # править руками бессмысленно — следующий релиз перезапишет.
-require_relative "../lib/private_strategy"
 
 class Clab < Formula
   desc "Cadence Lab: задачи, гейты и MCP из терминала"
@@ -43,26 +42,22 @@ class Clab < Formula
 
   on_macos do
     on_arm do
-      url "$base/clab_${tag}_darwin_arm64.tar.gz",
-          using: GitHubPrivateReleaseDownloadStrategy
+      url "$base/clab_${tag}_darwin_arm64.tar.gz"
       sha256 "$darwin_arm64"
     end
     on_intel do
-      url "$base/clab_${tag}_darwin_amd64.tar.gz",
-          using: GitHubPrivateReleaseDownloadStrategy
+      url "$base/clab_${tag}_darwin_amd64.tar.gz"
       sha256 "$darwin_amd64"
     end
   end
 
   on_linux do
     on_arm do
-      url "$base/clab_${tag}_linux_arm64.tar.gz",
-          using: GitHubPrivateReleaseDownloadStrategy
+      url "$base/clab_${tag}_linux_arm64.tar.gz"
       sha256 "$linux_arm64"
     end
     on_intel do
-      url "$base/clab_${tag}_linux_amd64.tar.gz",
-          using: GitHubPrivateReleaseDownloadStrategy
+      url "$base/clab_${tag}_linux_amd64.tar.gz"
       sha256 "$linux_amd64"
     end
   end

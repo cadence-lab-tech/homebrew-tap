@@ -2,12 +2,9 @@
 #
 # Установка clab на macOS и Linux:
 #
-#   gh api repos/cadence-lab-tech/homebrew-tap/contents/install.sh \
-#       -H "Accept: application/vnd.github.raw" | sh
+#   curl -fsSL https://raw.githubusercontent.com/cadence-lab-tech/homebrew-tap/main/install.sh | sh
 #
-# Тап и релизы лежат в приватных репозиториях, поэтому и скрипт, и
-# бинарники берутся с токеном участника организации: вошедший gh либо
-# GITHUB_TOKEN.
+# Тап и релизы CLI публичные: ни токена, ни gh не нужно — хватает curl.
 #
 #   CLAB_VERSION=v0.1.0        конкретный релиз вместо последнего
 #   CLAB_INSTALL_DIR=~/bin     куда класть; по умолчанию /usr/local/bin,
@@ -16,7 +13,7 @@
 # Тем, у кого есть Homebrew, проще: brew install cadence-lab-tech/tap/clab.
 set -eu
 
-repo="cadence-lab-tech/sdlc-pipeline-backend"
+repo="cadence-lab-tech/homebrew-tap"
 version="${CLAB_VERSION:-}"
 
 say() { printf '%s\n' "$*" >&2; }
@@ -26,7 +23,7 @@ need() { command -v "$1" >/dev/null 2>&1 || die "нужен $1"; }
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 case "$os" in
   darwin | linux) ;;
-  *) die "поддерживаются macOS и Linux; для Windows возьмите zip из релиза: https://github.com/$repo/releases" ;;
+  *) die "поддерживаются macOS и Linux; для Windows возьмите zip из релиза: https://github.com/$repo/releases/latest" ;;
 esac
 case "$(uname -m)" in
   x86_64 | amd64) arch=amd64 ;;
@@ -36,52 +33,30 @@ esac
 need curl
 need tar
 
-# Доступ к GitHub: токен из окружения или от вошедшего gh.
-token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
-if [ -z "$token" ] && command -v gh >/dev/null 2>&1; then
-  token=$(gh auth token 2>/dev/null || true)
-fi
-[ -n "$token" ] || die "нужен доступ к GitHub: gh auth login или GITHUB_TOKEN"
-
-api() {
-  curl -fsSL -H "Authorization: Bearer $token" -H "Accept: application/vnd.github+json" \
-    "https://api.github.com/$1"
-}
-
-# Описание релиза: тег и ассеты. jq на машине не обязателен, поэтому JSON
-# режется по фигурным скобкам на строки — у ассета в одной строке
-# оказываются его url, id и name, а у вложенного uploader — свои поля.
+# Последний релиз — по перенаправлению с /releases/latest: так не нужен ни
+# jq для разбора ответа API, ни его лимит на запросы без токена.
 if [ -n "$version" ]; then
-  release=$(api "repos/$repo/releases/tags/$version") || die "нет релиза $version в $repo"
+  tag="$version"
 else
-  release=$(api "repos/$repo/releases/latest") || die "не нашли релизов в $repo"
+  latest=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+    "https://github.com/$repo/releases/latest") || die "не дозвонились до GitHub"
+  tag="${latest##*/tag/}"
+  case "$tag" in
+    v*) ;;
+    *) die "не разобрали последний релиз из $latest" ;;
+  esac
 fi
-flat=$(printf '%s' "$release" | tr -d '\n ' | sed 's/{/\
-{/g')
-tag=$(printf '%s\n' "$flat" | sed -n 's/.*"tag_name":"\([^"]*\)".*/\1/p' | head -1)
-[ -n "$tag" ] || die "не разобрали ответ GitHub о релизе"
-
-asset_id() {
-  printf '%s\n' "$flat" | grep "\"name\":\"$1\"" | sed -n 's|.*/releases/assets/\([0-9]*\)".*|\1|p' | head -1
-}
-fetch() {
-  curl -fsSL -H "Authorization: Bearer $token" -H "Accept: application/octet-stream" \
-    -o "$2" "https://api.github.com/repos/$repo/releases/assets/$1"
-}
 
 name="clab_${tag}_${os}_${arch}"
 archive="$name.tar.gz"
-archive_id=$(asset_id "$archive")
-sums_id=$(asset_id checksums.txt)
-[ -n "$archive_id" ] || die "в релизе $tag нет $archive"
-[ -n "$sums_id" ] || die "в релизе $tag нет checksums.txt"
+base="https://github.com/$repo/releases/download/$tag"
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
 say "▸ качаем $archive"
-fetch "$archive_id" "$tmp/$archive"
-fetch "$sums_id" "$tmp/checksums.txt"
+curl -fsSL -o "$tmp/$archive" "$base/$archive" || die "в релизе $tag нет $archive"
+curl -fsSL -o "$tmp/checksums.txt" "$base/checksums.txt" || die "в релизе $tag нет checksums.txt"
 
 want=$(awk -v f="$archive" '$2 == f { print $1 }' "$tmp/checksums.txt")
 if command -v sha256sum >/dev/null 2>&1; then
