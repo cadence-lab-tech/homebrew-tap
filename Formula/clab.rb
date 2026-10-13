@@ -7,6 +7,7 @@
 class Clab < Formula
   desc "Cadence Lab: задачи, гейты и MCP из терминала"
   homepage "https://github.com/cadence-lab-tech/homebrew-tap"
+  license "FSL-1.1-ALv2"
   version "0.5.2"
 
   on_macos do
