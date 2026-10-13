@@ -38,6 +38,7 @@ cat <<RUBY
 class Clab < Formula
   desc "Cadence Lab: задачи, гейты и MCP из терминала"
   homepage "https://github.com/$repo"
+  license "FSL-1.1-ALv2"
   version "$version"
 
   on_macos do
