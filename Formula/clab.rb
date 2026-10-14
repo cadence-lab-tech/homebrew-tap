@@ -8,27 +8,27 @@ class Clab < Formula
   desc "Cadence Lab: задачи, гейты и MCP из терминала"
   homepage "https://github.com/cadence-lab-tech/homebrew-tap"
   license "FSL-1.1-ALv2"
-  version "0.5.3"
+  version "0.6.0"
 
   on_macos do
     on_arm do
-      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.5.3/clab_v0.5.3_darwin_arm64.tar.gz"
-      sha256 "de7ef954c98b556bd9504b0dfaaaab5ff9d29980260831b2583f031783da0b1c"
+      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.6.0/clab_v0.6.0_darwin_arm64.tar.gz"
+      sha256 "1a3a5d86ade1549f13a749c1e28f5a2cb4b3106ac2c27cf4f5b65e01ccfe06c9"
     end
     on_intel do
-      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.5.3/clab_v0.5.3_darwin_amd64.tar.gz"
-      sha256 "ba229cb3cc9842ccadd2b8101deae6b9e20abb8108af0ee99b1c7ea5e178cfe5"
+      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.6.0/clab_v0.6.0_darwin_amd64.tar.gz"
+      sha256 "d691488ab664da91d0595f48b07d3341ee4c073abe7375847e29d6e6de3d29ac"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.5.3/clab_v0.5.3_linux_arm64.tar.gz"
-      sha256 "e259cea26580be2228225621e3d45ff5145fd0ca06bac7fdd62369a13142087f"
+      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.6.0/clab_v0.6.0_linux_arm64.tar.gz"
+      sha256 "9cf627a6dc87673b43ba3ee920021a15335776546f4702e45c5846fa0be78879"
     end
     on_intel do
-      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.5.3/clab_v0.5.3_linux_amd64.tar.gz"
-      sha256 "ecec4972a8ddc6c488bf88a8b4ca16c52ef5067712d0961693ee8b486b2f614e"
+      url "https://github.com/cadence-lab-tech/homebrew-tap/releases/download/v0.6.0/clab_v0.6.0_linux_amd64.tar.gz"
+      sha256 "19a8e97c4227b6f3c6fce41864bd7abf242593185da5b02805532774120b5535"
     end
   end
 
@@ -37,6 +37,6 @@ class Clab < Formula
   end
 
   test do
-    assert_match "clab v0.5.3", shell_output("#{bin}/clab version")
+    assert_match "clab v0.6.0", shell_output("#{bin}/clab version")
   end
 end
