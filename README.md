@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-mark-dark.svg">
+  <img src="assets/logo-mark-light.svg" alt="Cadence Lab" height="48">
+</picture>
+
 # Cadence Lab Homebrew tap
 
 `clab` is the command-line interface of
